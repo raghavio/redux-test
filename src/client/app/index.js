@@ -25,6 +25,18 @@ class SpreadSheet extends React.Component {
     var hot = new Handsontable(document.getElementById("table"), {
       minSpareRows: 1,
       manualRowResize: false,
+      afterChange: function(change, source) {
+        if (source == "edit") {
+          var row = this.getDataAtRow(change[0][0]);
+          var rowEmpty = row.filter(function(item) {
+            return item == null;
+          }).length > 0;
+
+          if (!rowEmpty) {
+            //TODO send each complete row instead of whole data
+          }
+        }
+      }
     });
     getDataFromServer(hot);
 
@@ -35,6 +47,7 @@ class SpreadSheet extends React.Component {
     }
 
     var store = createStore(data);
+
     var config = {
       headers: {'Content-Type': 'application/json'}
     };
@@ -45,23 +58,21 @@ class SpreadSheet extends React.Component {
         console.log(response);
       })
     )
-
-  this.setState({store: store});
-
+    this.setState({store: store});
 }
 
-handleClick () {
-  this.state.store.dispatch({type: 'GET'});
-}
+  handleClick () {
+    this.state.store.dispatch({type: 'GET'});
+  }
 
-render () {
-  return (
-    <div>
-    <div id="table"></div>
-    <button onClick={this.handleClick}>Dispatch</button>
-    </div>
-  );
-}
+  render () {
+    return (
+      <div>
+        <div id="table"></div>
+        <button onClick={this.handleClick}>Dispatch</button>
+      </div>
+    );
+  }
 }
 
 
